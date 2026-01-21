@@ -1,6 +1,13 @@
 #include <SDL2/SDL.h>
 #include "game.h"
+#include "utilities.h"
 #include <stdio.h>
+
+int n;
+int l;
+
+void setn(int n0){n = n0;}
+void setl(int l0){l = l0;}
 
 bool init(SDL_Window **window, SDL_Renderer **renderer)
 {
@@ -31,7 +38,7 @@ bool init(SDL_Window **window, SDL_Renderer **renderer)
     return true;
 }
 
-void handle_input(bool *running, const Uint8 *keys, Entity *player, Entity *bullet, bool *bullet_active)
+void handle_input(bool *running, const Uint8 *keys, Player *p, Entity *bullet, bool *bullet_active)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -40,56 +47,96 @@ void handle_input(bool *running, const Uint8 *keys, Entity *player, Entity *bull
             *running = false;
     }
 
-    player->vx = 0.0f;
+    setVxPlayer(p, 0.0f);
     if (keys[SDL_SCANCODE_LEFT])
-        player->vx = -PLAYER_SPEED;
+        setVxPlayer(p, -PLAYER_SPEED);
     if (keys[SDL_SCANCODE_RIGHT])
-        player->vx = PLAYER_SPEED;
+        setVxPlayer(p, PLAYER_SPEED);
 
     if (keys[SDL_SCANCODE_SPACE] && !*bullet_active)
     {
         *bullet_active = true;
-        bullet->x = player->x + player->w / 2 - BULLET_WIDTH / 2;
-        bullet->y = player->y;
-        bullet->w = BULLET_WIDTH;
-        bullet->h = BULLET_HEIGHT;
-        bullet->vy = -BULLET_SPEED;
+        setXEntity(bullet, getXPlayer(p) + getWPlayer(p) / 2 - BULLET_WIDTH / 2);
+        setYEntity(bullet, getYPlayer(p));
+        setWEntity(bullet, BULLET_WIDTH);
+        setHEntity(bullet, BULLET_HEIGHT);
+        setVyEntity(bullet, -BULLET_SPEED);
     }
 }
 
-void update(Entity *player, Entity *bullet, bool *bullet_active, float dt)
+void update(Player *p, Entity *bullet, bool *bullet_active, Enemy *enemies, bool *running, float dt)
 {
-    player->x += player->vx * dt;
-
-    if (player->x < 0)
-        player->x = 0;
-    if (player->x + player->w > SCREEN_WIDTH)
-        player->x = SCREEN_WIDTH - player->w;
-
+    //Update Player
+    setXPlayer(p, getXPlayer(p) + getVxPlayer(p) * dt);
+    if (getXPlayer(p) < 0)
+        setXPlayer(p, 0);
+    if (getXPlayer(p) + getWPlayer(p) > SCREEN_WIDTH)
+        setXPlayer(p, SCREEN_WIDTH - getWPlayer(p));
+        
+    //Update Bullets
     if (*bullet_active)
     {
-        bullet->y += bullet->vy * dt;
-        if (bullet->y + bullet->h < 0)
+        setYEntity(bullet, getYEntity(bullet) + getVyEntity(bullet) * dt);
+
+        if (getYEntity(bullet) + getHEntity(bullet) < 0)
             *bullet_active = false;
+    }
+
+    //Update Enemies
+    for(int i = 0; i < (n * l); i++){
+        Enemy *e = &enemies[i];
+        if(!e->is_dead){
+            setYEnemy(e, getYEnemy(e) + getVyEnemy(e) * dt);
+            if (*bullet_active)
+    {
+        if(collisionBulletEnemy(e, bullet)){
+            e->is_dead = true;
+            *bullet_active = false;
+        }
+    }
+        }
+        
+        
+
+        if (getYEnemy(e) > SCREEN_HEIGHT - getHEnemy(e) || collisionPlayerEnemy(p, e)){
+            *running = false;
+            return;
+        }
+
     }
 }
 
-void render(SDL_Renderer *renderer, Entity *player, Entity *bullet, bool bullet_active)
+void render(SDL_Renderer *renderer, Player *p, Entity *bullet, bool bullet_active, Enemy *enemies)
 {
+    //Bakcground
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    SDL_Rect player_rect = {
-        (int)player->x, (int)player->y,
-        player->w, player->h};
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_RenderFillRect(renderer, &player_rect);
+    //Player
+    SDL_Rect p_rect = {
+        (int)getXPlayer(p), (int)getYPlayer(p),
+        getWPlayer(p), getHPlayer(p)};
+    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    SDL_RenderFillRect(renderer, &p_rect);
 
+    //Enemies
+    for(int i = 0; i < (n * l); i++){
+        Enemy *e = &enemies[i];
+        if(!e->is_dead){
+            SDL_Rect enemy_rect = {
+                (int)getXEnemy(e), (int)getYEnemy(e),
+                getWEnemy(e), getHEnemy(e)};
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_RenderFillRect(renderer, &enemy_rect);
+        }
+    }
+
+    //Bullet
     if (bullet_active)
     {
         SDL_Rect bullet_rect = {
-            (int)bullet->x, (int)bullet->y,
-            bullet->w, bullet->h};
+            (int)getXEntity(bullet), (int)getYEntity(bullet),
+            getWEntity(bullet), getHEntity(bullet)};
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &bullet_rect);
     }

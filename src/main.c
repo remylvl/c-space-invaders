@@ -87,6 +87,14 @@ int main(void)
             handle_input_starting(&phase, keys);
             renderStartMenu(renderer, font);
             break;
+        case END_GAME_LOSE:
+            handle_input_ending(&phase, keys);
+            renderLoseMenu(renderer, font);
+            break;
+        case END_GAME_WIN : 
+            handle_input_ending(&phase, keys);
+            renderWinMenu(renderer, font);
+            break;
         default : break;
         }
     }

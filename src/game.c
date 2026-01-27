@@ -33,6 +33,7 @@ bool init(SDL_Window **window, SDL_Renderer **renderer)
         SDL_Quit();
         return false;
     }
+    //SDL_SetWindowFullscreen(*window, SDL_WINDOW_FULLSCREEN);
 
     *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
     if (!*renderer)
@@ -70,12 +71,6 @@ void handle_input_playing(GamePhase *phase, const Uint8 *keys, Player *p, Entity
         setHEntity(bullet, BULLET_HEIGHT);
         setVyEntity(bullet, -BULLET_SPEED);
     }
-}
-
-void handle_input(GamePhase *phase)
-{
-    
-
 }
 
 void handle_input_starting(GamePhase *phase, const Uint8 *keys)
@@ -128,26 +123,29 @@ void update(Player *p, Entity *bullet, bool *bullet_active, Enemy *enemies, Game
     }
 
     //Update Enemies
+    int counter = 0;
     for(int i = 0; i < (n * l); i++){
         Enemy *e = &enemies[i];
+        
         if(!e->is_dead){
+            counter = 1;
             setYEnemy(e, getYEnemy(e) + getVyEnemy(e) * dt);
-            if (*bullet_active)
-    {
+            if (*bullet_active){
         if(collisionBulletEnemy(e, bullet)){
             e->is_dead = true;
             *bullet_active = false;
+            }
+            }
         }
-    }
-        }
-        
-        
 
         if (getYEnemy(e) > SCREEN_HEIGHT - getHEnemy(e) || collisionPlayerEnemy(p, e)){
-            *phase = QUITTING;
+            *phase = END_GAME_LOSE;
             return;
-        }
-
+                }
+    }
+    if(counter == 0){
+        *phase = END_GAME_WIN;
+        return;
     }
 }
 
@@ -227,12 +225,74 @@ void renderStartMenu(SDL_Renderer *renderer, TTF_Font *font)
     SDL_RenderCopy(renderer, start_texture, NULL, &start_rect);
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderDrawRect(renderer, &unfill_rect);
-    SDL_RenderPresent(renderer);
 
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(text);
-    SDL_DestroyTexture(start_texture);
-    SDL_FreeSurface(start);
+    SDL_RenderPresent(renderer);
+}
+
+void renderLoseMenu(SDL_Renderer *renderer, TTF_Font *font)
+{
+    //Background
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    //Title
+    SDL_Surface *text = TTF_RenderUTF8_Solid(font, "You lost !", (SDL_Color) {255, 0, 0, 255});
+    SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, text);
+
+    SDL_Rect text_rect = {
+        (SCREEN_WIDTH - text->w) / 2,  // x position
+        SCREEN_HEIGHT / 4,  // y position
+        text->w,  // width
+        text->h   // height
+    };
+    SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+    //leave text
+    SDL_Surface *leave = TTF_RenderUTF8_Solid(font, "Press Enter to leave", (SDL_Color) {255, 0, 0, 255});
+    SDL_Texture *leave_texture = SDL_CreateTextureFromSurface(renderer, leave);
+
+    SDL_Rect leave_rect = {
+        (SCREEN_WIDTH - leave->w) / 2,  // x position
+        2 * SCREEN_HEIGHT / 3,  // y position
+        leave->w,  // width
+        leave->h  // height
+    };
+    SDL_RenderCopy(renderer, leave_texture, NULL, &leave_rect);
+    
+    SDL_RenderPresent(renderer);
+}
+
+void renderWinMenu(SDL_Renderer *renderer, TTF_Font *font)
+{
+    //Background
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    //Title
+    SDL_Surface *text = TTF_RenderUTF8_Solid(font, "You won !", (SDL_Color) {0, 255, 0, 255});
+    SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, text);
+
+    SDL_Rect text_rect = {
+        (SCREEN_WIDTH - text->w) / 2,  // x position
+        SCREEN_HEIGHT / 4,  // y position
+        text->w,  // width
+        text->h   // height
+    };
+    SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+    //leave text
+    SDL_Surface *leave = TTF_RenderUTF8_Solid(font, "Press Enter to leave", (SDL_Color) {0, 255, 0, 255});
+    SDL_Texture *leave_texture = SDL_CreateTextureFromSurface(renderer, leave);
+
+    SDL_Rect leave_rect = {
+        (SCREEN_WIDTH - leave->w) / 2,  // x position
+        2 * SCREEN_HEIGHT / 3,  // y position
+        leave->w,  // width
+        leave->h  // height
+    };
+    SDL_RenderCopy(renderer, leave_texture, NULL, &leave_rect);
+    
+    SDL_RenderPresent(renderer);
 }
 
 void cleanup(SDL_Window *window, SDL_Renderer *renderer)

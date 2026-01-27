@@ -3,6 +3,7 @@
 #include "entities.h"
 #include "game.h"
 #include "utilities.h"
+#include <SDL2/SDL_ttf.h>
 
 
 int main(void)
@@ -12,13 +13,22 @@ int main(void)
     const int n = 6;
     const int l = 2; 
     const int offsetX = NORMAL_ENNEMY_WIDTH / 2;
-    const int offsetY = SCREEN_WIDTH / 20;
+    const int offsetY = SCREEN_HEIGHT / 20;
 
     setl(l);
     setn(n);
 
     if (!init(&window, &renderer))
     {
+        return 1;
+    }
+
+    // Charger une police
+    TTF_Font *font = TTF_OpenFont("/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf", 64);
+    if (!font)
+    {
+        SDL_Log("Erreur chargement police: %s", TTF_GetError());
+        cleanup(window, renderer);
         return 1;
     }
 
@@ -37,6 +47,7 @@ int main(void)
 
     Entity bullet = {0};
     Enemy *enemies = malloc(sizeof(Enemy) * n * l);
+    if(enemies == NULL) return 1;
     for(int i = 0; i < (n * l); i++){
         Enemy e = {
             .entity = {
@@ -63,14 +74,23 @@ int main(void)
         if (dt > 0.05f)
             dt = 0.05f;
         last_ticks = ticks;
-
         SDL_PumpEvents();
         const Uint8 *keys = SDL_GetKeyboardState(NULL);
-        handle_input(&phase, keys, &player, &bullet, &bullet_active);
-        update(&player, &bullet, &bullet_active, enemies, &phase, dt);
-        render(renderer, &player, &bullet, bullet_active, enemies);
-    }
 
+        switch(phase){
+        case PLAYING : 
+            handle_input_playing(&phase, keys, &player, &bullet, &bullet_active);
+            update(&player, &bullet, &bullet_active, enemies, &phase, dt);
+            renderGame(renderer, &player, &bullet, bullet_active, enemies);
+            break;
+        case START_MENU :
+            handle_input_starting(&phase, keys);
+            renderStartMenu(renderer, font);
+            break;
+        default : break;
+        }
+    }
+    if (font) TTF_CloseFont(font);
     cleanup(window, renderer);
     free(enemies);
     return 0;

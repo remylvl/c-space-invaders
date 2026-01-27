@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include "entities.h"
 #include "utilities.h"
@@ -22,9 +23,13 @@
 #define BULLET_SPEED 600.0f
 
 bool init(SDL_Window **window, SDL_Renderer **renderer);
-void handle_input(GamePhase *phase, const Uint8 *keys, Player *player, Entity *bullet, bool *bullet_active);
+void handle_input_playing(GamePhase *phase, const Uint8 *keys, Player *player, Entity *bullet, bool *bullet_active);
+void handle_input(GamePhase *phase);
+void handle_input_starting(GamePhase *phase, const Uint8 *keys);
+void handle_input_losing(GamePhase *phase, const Uint8 *keys);
 void update(Player *player, Entity *bullet, bool *bullet_active, Enemy *enemies, GamePhase *phase, float dt);
-void render(SDL_Renderer *renderer, Player *player, Entity *bullet, bool bullet_active, Enemy *enemies);
+void renderGame(SDL_Renderer *renderer, Player *player, Entity *bullet, bool bullet_active, Enemy *enemies);
+void renderStartMenu(SDL_Renderer *renderer, TTF_Font *font);
 void cleanup(SDL_Window *window, SDL_Renderer *renderer);
 void setn(int n0);
 void setl(int l0);

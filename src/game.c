@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "game.h"
 #include "utilities.h"
 #include <stdio.h>
@@ -14,6 +15,13 @@ bool init(SDL_Window **window, SDL_Renderer **renderer)
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         SDL_Log("Erreur SDL_Init: %s", SDL_GetError());
+        return false;
+    }
+
+    if (TTF_Init() == -1)
+    {
+        SDL_Log("Erreur TTF_Init: %s", TTF_GetError());
+        SDL_Quit();
         return false;
     }
 
@@ -38,7 +46,7 @@ bool init(SDL_Window **window, SDL_Renderer **renderer)
     return true;
 }
 
-void handle_input(GamePhase *phase, const Uint8 *keys, Player *p, Entity *bullet, bool *bullet_active)
+void handle_input_playing(GamePhase *phase, const Uint8 *keys, Player *p, Entity *bullet, bool *bullet_active)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -63,6 +71,43 @@ void handle_input(GamePhase *phase, const Uint8 *keys, Player *p, Entity *bullet
         setVyEntity(bullet, -BULLET_SPEED);
     }
 }
+
+void handle_input(GamePhase *phase)
+{
+    
+
+}
+
+void handle_input_starting(GamePhase *phase, const Uint8 *keys)
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+            *phase = QUITTING;
+    }
+
+    if(keys[SDL_SCANCODE_RETURN]){
+        *phase = PLAYING;
+    }
+}
+
+void handle_input_ending(GamePhase *phase, const Uint8 *keys)
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+            *phase = QUITTING;
+    }
+
+    if(keys[SDL_SCANCODE_RETURN]){
+        *phase = QUITTING;
+    }
+}
+
+
+
 
 void update(Player *p, Entity *bullet, bool *bullet_active, Enemy *enemies, GamePhase *phase, float dt)
 {
@@ -106,9 +151,9 @@ void update(Player *p, Entity *bullet, bool *bullet_active, Enemy *enemies, Game
     }
 }
 
-void render(SDL_Renderer *renderer, Player *p, Entity *bullet, bool bullet_active, Enemy *enemies)
+void renderGame(SDL_Renderer *renderer, Player *p, Entity *bullet, bool bullet_active, Enemy *enemies)
 {
-    //Bakcground
+    //Background
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
@@ -144,11 +189,58 @@ void render(SDL_Renderer *renderer, Player *p, Entity *bullet, bool bullet_activ
     SDL_RenderPresent(renderer);
 }
 
+void renderStartMenu(SDL_Renderer *renderer, TTF_Font *font)
+{
+    //Background
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    //Title
+    SDL_Surface *text = TTF_RenderUTF8_Solid(font, "Space Invaders", (SDL_Color) {192, 192, 192, 200});
+    SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, text);
+
+    SDL_Rect text_rect = {
+        (SCREEN_WIDTH - text->w) / 2,  // x position
+        SCREEN_HEIGHT / 4,  // y position
+        text->w,  // width
+        text->h   // height
+    };
+    SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+    //Start button
+    SDL_Surface *start = TTF_RenderUTF8_Solid(font, "Start", (SDL_Color) {255, 0, 0, 255});
+    SDL_Texture *start_texture = SDL_CreateTextureFromSurface(renderer, start);
+
+    SDL_Rect start_rect = {
+        (SCREEN_WIDTH - start->w) / 2,  // x position
+        2 * SCREEN_HEIGHT / 3,  // y position
+        start->w,  // width
+        start->h  // height
+    };
+
+    SDL_Rect unfill_rect = {
+        (SCREEN_WIDTH - start->w) / 2 - 0.25 * start->w,  // x position
+        2 * SCREEN_HEIGHT / 3 - 0.1 * start->h,  // y position
+        start->w * 1.5,  // width
+        start->h * 1.2  // height
+    };
+    SDL_RenderCopy(renderer, start_texture, NULL, &start_rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderDrawRect(renderer, &unfill_rect);
+    SDL_RenderPresent(renderer);
+
+    SDL_DestroyTexture(text_texture);
+    SDL_FreeSurface(text);
+    SDL_DestroyTexture(start_texture);
+    SDL_FreeSurface(start);
+}
+
 void cleanup(SDL_Window *window, SDL_Renderer *renderer)
 {
     if (renderer)
         SDL_DestroyRenderer(renderer);
     if (window)
         SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
 }

@@ -38,13 +38,13 @@ bool init(SDL_Window **window, SDL_Renderer **renderer)
     return true;
 }
 
-void handle_input(bool *running, const Uint8 *keys, Player *p, Entity *bullet, bool *bullet_active)
+void handle_input(GamePhase *phase, const Uint8 *keys, Player *p, Entity *bullet, bool *bullet_active)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
         if (event.type == SDL_QUIT)
-            *running = false;
+            *phase = QUITTING;
     }
 
     setVxPlayer(p, 0.0f);
@@ -64,7 +64,7 @@ void handle_input(bool *running, const Uint8 *keys, Player *p, Entity *bullet, b
     }
 }
 
-void update(Player *p, Entity *bullet, bool *bullet_active, Enemy *enemies, bool *running, float dt)
+void update(Player *p, Entity *bullet, bool *bullet_active, Enemy *enemies, GamePhase *phase, float dt)
 {
     //Update Player
     setXPlayer(p, getXPlayer(p) + getVxPlayer(p) * dt);
@@ -99,7 +99,7 @@ void update(Player *p, Entity *bullet, bool *bullet_active, Enemy *enemies, bool
         
 
         if (getYEnemy(e) > SCREEN_HEIGHT - getHEnemy(e) || collisionPlayerEnemy(p, e)){
-            *running = false;
+            *phase = QUITTING;
             return;
         }
 

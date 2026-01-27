@@ -65,3 +65,19 @@ void setHEnemy(Enemy *e, int h);
 //Autres
 bool collisionBulletEnemy(Enemy *e, Entity *bullet);
 bool collisionPlayerEnemy(Player *p, Enemy *e);
+
+#ifndef GAMEPHASE
+#define GAMEPHASE
+
+typedef enum
+{
+    START_MENU,
+    SETTINGS,
+    CHOOSING_LEVEL,
+    PLAYING,
+    END_GAME_WIN,
+    END_GAME_LOSE,
+    QUITTING
+} GamePhase;
+
+#endif

@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include "entities.h"
 #include "game.h"
+#include "utilities.h"
 
 
 int main(void)
@@ -21,7 +22,7 @@ int main(void)
         return 1;
     }
 
-    bool running = true;
+    GamePhase phase = START_MENU;
     Uint32 last_ticks = SDL_GetTicks();
 
     Player player = {
@@ -55,7 +56,7 @@ int main(void)
 
     bool bullet_active = false;
 
-    while (running)
+    while (phase != QUITTING)
     {
         Uint32 ticks = SDL_GetTicks();
         float dt = (ticks - last_ticks) / 1000.0f;
@@ -65,8 +66,8 @@ int main(void)
 
         SDL_PumpEvents();
         const Uint8 *keys = SDL_GetKeyboardState(NULL);
-        handle_input(&running, keys, &player, &bullet, &bullet_active);
-        update(&player, &bullet, &bullet_active, enemies, &running, dt);
+        handle_input(&phase, keys, &player, &bullet, &bullet_active);
+        update(&player, &bullet, &bullet_active, enemies, &phase, dt);
         render(renderer, &player, &bullet, bullet_active, enemies);
     }
 

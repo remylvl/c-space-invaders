@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include "entities.h"
+#include "utilities.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -21,8 +22,8 @@
 #define BULLET_SPEED 600.0f
 
 bool init(SDL_Window **window, SDL_Renderer **renderer);
-void handle_input(bool *running, const Uint8 *keys, Player *player, Entity *bullet, bool *bullet_active);
-void update(Player *player, Entity *bullet, bool *bullet_active, Enemy *enemies, bool *running, float dt);
+void handle_input(GamePhase *phase, const Uint8 *keys, Player *player, Entity *bullet, bool *bullet_active);
+void update(Player *player, Entity *bullet, bool *bullet_active, Enemy *enemies, GamePhase *phase, float dt);
 void render(SDL_Renderer *renderer, Player *player, Entity *bullet, bool bullet_active, Enemy *enemies);
 void cleanup(SDL_Window *window, SDL_Renderer *renderer);
 void setn(int n0);

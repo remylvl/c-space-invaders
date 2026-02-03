@@ -1,5 +1,6 @@
 #include "entities.h"
 #include <stdbool.h>
+#include "game.h"
 
 //GETTERS
 //getX
@@ -162,11 +163,38 @@ void setHEnemy(Enemy *e, int h){
 //Autres
 
 bool collisionBulletEnemy(Enemy *e, Entity *bullet){
-    return (getYEntity(bullet) <= (getYEnemy(e) + getHEnemy(e))) && (getYEntity(bullet) >= getYEnemy(e)) 
+    return (getYEntity(bullet) <= (getYEnemy(e) + getHEnemy(e))) && (getYEntity(bullet) + getHEntity(bullet) >= getYEnemy(e)) 
     && (getXEntity(bullet) <= (getXEnemy(e) + getWEnemy(e))) && (getXEntity(bullet) + getWEntity(bullet) >= getXEnemy(e));
 }
 
 bool collisionPlayerEnemy(Player *p, Enemy *e){
-    return (getYPlayer(p) <= (getYEnemy(e) + getHEnemy(e))) && (getYPlayer(p) >= getYEnemy(e)) 
+    return (getYPlayer(p) <= (getYEnemy(e) + getHEnemy(e))) && (getYPlayer(p) + getHPlayer(p) >= getYEnemy(e)) 
     && (getXPlayer(p) <= (getXEnemy(e) + getWEnemy(e))) && (getXPlayer(p) + getWPlayer(p) >= getXEnemy(e));
+}
+
+bool collisionBulletPlayer(Player *p, Entity *bullet){
+    return (getYEntity(bullet) <= (getYPlayer(p) + getHPlayer(p))) && (getYEntity(bullet) + getHEntity(bullet) >= getYPlayer(p)) 
+    && (getXEntity(bullet) <= (getXPlayer(p) + getWPlayer(p))) && (getXEntity(bullet) + getWEntity(bullet) >= getXPlayer(p));
+}
+
+
+void spawnEnemyBullet(Enemy *e){
+    e->is_bullet_active = true;
+    Entity *bullet = &e->bullet;
+    setXEntity(bullet, getXEnemy(e) + getWEnemy(e) / 2 - NORMAL_ENNEMY_BULLET_WIDTH / 2);
+    setYEntity(bullet, getYEnemy(e));
+    setWEntity(bullet, NORMAL_ENNEMY_BULLET_WIDTH);
+    setHEntity(bullet, NORMAL_ENNEMY_BULLET_HEIGHT);
+    setVyEntity(bullet, NORMAL_ENNEMY_BULLET_SPEED);
+}
+
+void spawnHeart(Entity *hearts){
+    //realloc(hearts, );
+}
+
+void hurtPlayer(Player *p, int damage, GamePhase *phase){
+    p->HP -= damage;
+    if(p->HP <= 0){
+        *phase = END_GAME_LOSE;
+    }
 }

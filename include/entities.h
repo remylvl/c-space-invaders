@@ -1,36 +1,30 @@
+#pragma once
+
 #include <stdbool.h>
 
-#ifndef ENTITY_H
-#define ENTITY_H
-
-typedef struct
+typedef struct 
 {
     float x, y;
     float vx, vy;
     int w, h;
 } Entity;
 
-#endif
-
-#ifndef PLAYER_H
-#define PLAYER_H
 
 typedef struct
 {
     Entity entity;
+    int HP;
+    bool is_bullet_active;
+    Entity bullet;
 
 } Player;
 
-#endif
-
-#ifndef ENNEMY_H
-#define ENNEMY_H
 
 typedef struct
 {
     Entity entity;
     bool is_dead;
+    Entity bullet;
+    bool is_bullet_active;
 
 } Enemy;
-
-#endif

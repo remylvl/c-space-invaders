@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include "entities.h"
 #include "game.h"
+#include "render.h"
+#include "input.h"
 #include "utilities.h"
 #include <SDL2/SDL_ttf.h>
 
@@ -10,19 +12,17 @@ int main(void)
 {
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
-    const int n = 6;
-    const int l = 2; 
+    const int n = 5;
+    const int l = 3; 
     const int offsetX = NORMAL_ENNEMY_WIDTH / 2;
-    const int offsetY = SCREEN_HEIGHT / 20;
-
-    setl(l);
-    setn(n);
+    const int offsetY = SCREEN_HEIGHT / 10;
 
     if (!init(&window, &renderer))
     {
         return 1;
     }
 
+    /*A BOUGER*/
     // Charger une police
     TTF_Font *font = TTF_OpenFont("/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf", 64);
     if (!font)
@@ -32,7 +32,14 @@ int main(void)
         return 1;
     }
 
-    GamePhase phase = START_MENU;
+    TTF_Font *hp_font = TTF_OpenFont("/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf", 48);
+    if (!font)
+    {
+        SDL_Log("Erreur chargement police: %s", TTF_GetError());
+        cleanup(window, renderer);
+        return 1;
+    }
+
     Uint32 last_ticks = SDL_GetTicks();
 
     Player player = {
@@ -42,10 +49,12 @@ int main(void)
         .w = PLAYER_WIDTH,
         .h = PLAYER_HEIGHT,
         .vx = 0,
-        .vy = 0}
+        .vy = 0,},
+        .HP = 3,
+        .is_bullet_active = false,
+        .bullet = {0}
     };
 
-    Entity bullet = {0};
     Enemy *enemies = malloc(sizeof(Enemy) * n * l);
     if(enemies == NULL) return 1;
     for(int i = 0; i < (n * l); i++){
@@ -58,16 +67,22 @@ int main(void)
             .vx = 0,
             .vy = NORMAL_ENNEMY_SPEED},
 
-        .is_dead = false        
+        .is_dead = false,
+        .is_bullet_active = false,
+        .bullet = {0}        
         };
         enemies[i] = e;
     }
 
-    
+    Game game = {
+        .columns = n,
+        .lines = l,
+        .enemies = enemies,
+        .gamephase = START_MENU,
+        .p = player
+    };
 
-    bool bullet_active = false;
-
-    while (phase != QUITTING)
+    while (game.gamephase != QUITTING)
     {
         Uint32 ticks = SDL_GetTicks();
         float dt = (ticks - last_ticks) / 1000.0f;
@@ -77,28 +92,29 @@ int main(void)
         SDL_PumpEvents();
         const Uint8 *keys = SDL_GetKeyboardState(NULL);
 
-        switch(phase){
+        switch(game.gamephase){
         case PLAYING : 
-            handle_input_playing(&phase, keys, &player, &bullet, &bullet_active);
-            update(&player, &bullet, &bullet_active, enemies, &phase, dt);
-            renderGame(renderer, &player, &bullet, bullet_active, enemies);
+            handle_input_playing(&game, keys);
+            update(&game, dt);
+            renderGame(renderer, hp_font, &game);
             break;
         case START_MENU :
-            handle_input_starting(&phase, keys);
+            handle_input_starting(&game, keys);
             renderStartMenu(renderer, font);
             break;
         case END_GAME_LOSE:
-            handle_input_ending(&phase, keys);
+            handle_input_ending(&game, keys);
             renderLoseMenu(renderer, font);
             break;
         case END_GAME_WIN : 
-            handle_input_ending(&phase, keys);
+            handle_input_ending(&game, keys);
             renderWinMenu(renderer, font);
             break;
         default : break;
         }
     }
     if (font) TTF_CloseFont(font);
+    if (hp_font) TTF_CloseFont(hp_font);
     cleanup(window, renderer);
     free(enemies);
     return 0;

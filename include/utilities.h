@@ -1,5 +1,51 @@
 #include "entities.h"
 
+
+#ifndef GAMEPHASE
+#define GAMEPHASE
+
+typedef enum
+{
+    START_MENU,
+    SETTINGS,
+    CHOOSING_LEVEL,
+    PLAYING,
+    END_GAME_WIN,
+    END_GAME_LOSE,
+    QUITTING
+} GamePhase;
+
+#endif
+
+#ifndef LEVEL
+#define LEVEL
+
+typedef enum
+{
+    LEVEL1,
+    LEVEL2,
+    LEVEL3
+} Level;
+
+#endif
+
+#ifndef GAME
+#define GAME
+
+typedef struct
+{
+    GamePhase gamephase;
+    Level level;
+    Entity *hearts;
+    int hearts_len;
+    Player p;
+    Enemy *enemies;
+    int lines;
+    int columns;
+} Game;
+
+#endif
+
 //GETTERS
 //getX
 float getXPlayer(Player *p);
@@ -65,19 +111,7 @@ void setHEnemy(Enemy *e, int h);
 //Autres
 bool collisionBulletEnemy(Enemy *e, Entity *bullet);
 bool collisionPlayerEnemy(Player *p, Enemy *e);
+bool collisionBulletPlayer(Player *p, Entity *bullet);
+void spawnEnemyBullet(Enemy *e);
+void hurtPlayer(Player *p, int damage, GamePhase *phase);
 
-#ifndef GAMEPHASE
-#define GAMEPHASE
-
-typedef enum
-{
-    START_MENU,
-    SETTINGS,
-    CHOOSING_LEVEL,
-    PLAYING,
-    END_GAME_WIN,
-    END_GAME_LOSE,
-    QUITTING
-} GamePhase;
-
-#endif

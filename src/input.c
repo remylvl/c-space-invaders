@@ -1,16 +1,14 @@
-#include "game.h"
 #include "utilities.h"
-#include "entities.h"
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "game.h"
+#include "entities.h"
 
 
 void handle_input_playing(Game *game, const Uint8 *keys)
 {
     Player *p = &game->p;
-    bool *bullet_active = &p->is_bullet_active;
-    Entity *bullet = &p->bullet;
     GamePhase *phase = &game->gamephase;
 
 
@@ -27,14 +25,23 @@ void handle_input_playing(Game *game, const Uint8 *keys)
     if (keys[SDL_SCANCODE_RIGHT])
         setVxPlayer(p, PLAYER_SPEED);
 
-    if (keys[SDL_SCANCODE_SPACE] && !*bullet_active)
+    Uint32 ticks = SDL_GetTicks();
+
+    if (keys[SDL_SCANCODE_SPACE] && ticks - p->last_shot_ticks > BULLET_RELOAD_TIME)
     {
-        *bullet_active = true;
-        setXEntity(bullet, getXPlayer(p) + getWPlayer(p) / 2 - BULLET_WIDTH / 2);
-        setYEntity(bullet, getYPlayer(p));
-        setWEntity(bullet, BULLET_WIDTH);
-        setHEntity(bullet, BULLET_HEIGHT);
-        setVyEntity(bullet, -BULLET_SPEED);
+        for(int i = 0; i < MAX_BULLETS; i++){
+            if(!p->bullets[i].is_visible){
+                p->bullets[i].is_visible = true;
+                p->bullets[i].x = p->entity.x + p->entity.w / 2 - BULLET_WIDTH / 2;
+                p->bullets[i].y = p->entity.y;
+                p->bullets[i].w = BULLET_WIDTH;
+                p->bullets[i].h = BULLET_HEIGHT;
+                p->bullets[i].vy = -BULLET_SPEED;
+                p->last_shot_ticks = ticks;
+                break;
+            }
+        }
+        
     }
 }
 

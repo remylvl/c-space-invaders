@@ -1,16 +1,15 @@
-#include "game.h"
 #include "utilities.h"
 #include "render.h"
 #include "entities.h"
 #include <stdio.h>
+#include <SDL2/SDL.h>
 #include <stdlib.h>
+#include "game.h"
 
 
 void update(Game *game, float dt)
 {
     Player *p = &game->p;
-    bool *bullet_active = &p->is_bullet_active;
-    Entity *bullet = &p->bullet;
     Enemy *enemies = game->enemies;
     GamePhase *phase = &game->gamephase;
     int lines = game->lines;
@@ -26,13 +25,15 @@ void update(Game *game, float dt)
         setXPlayer(p, SCREEN_WIDTH - getWPlayer(p));
         
     //Update Bullets
-    if (*bullet_active)
+    for(int i = 0; i < MAX_BULLETS; i++)
     {
-        setYEntity(bullet, getYEntity(bullet) + getVyEntity(bullet) * dt);
+        Entity *bullet = &p->bullets[i];
+        if(bullet->is_visible){
+            bullet->y += bullet->vy * dt;
 
-        if (getYEntity(bullet) + getHEntity(bullet) < 0)
-            *bullet_active = false;
-    }
+        if (bullet->y + bullet->h < 0)
+            bullet->is_visible = false;
+    }}
 
     //Update Upgrades
     for(int i = 0; i < game->hearts_len; i++){
@@ -55,21 +56,32 @@ void update(Game *game, float dt)
         if(!e->is_dead){
             counter = 1;
             setYEnemy(e, getYEnemy(e) + getVyEnemy(e) * dt);
-            if (*bullet_active){
-        if(collisionBulletEnemy(e, bullet)){
-            e->is_dead = true;
-            *bullet_active = false;
-            if(rand() % 4 == 0){
-                spawnHeart(game, e->entity.x + e->entity.w / 2 - 8, e->entity.y + e->entity.h / 2 - 8);
+
+            if(game->boost_enemies){
+                e->entity.vy *= NORMAL_ENEMY_BOOST_FACTOR;
+            }
+
+            if(!e->is_bullet_active){
+                    if(rand() % (NORMAL_ENNEMY_SHOOT_RATE * columns * lines) == 0){
+                        spawnEnemyBullet(e);
+                }
+            }
+
+            for(int i = 0; i < MAX_BULLETS; i++){
+                Entity *bullet = &p->bullets[i];
+                if(collisionBulletEnemy(e, bullet) && bullet->is_visible){
+                    e->is_dead = true;
+                    bullet->is_visible = false;
+                    if(rand() % HEART_RATE == 0){
+                        spawnHeart(game, e->entity.x + e->entity.w / 2 - 8, e->entity.y + e->entity.h / 2 - 8);
+                
+                    }
+                }
+
                 
             }
-            }
-        if(!e->is_bullet_active){
-            if(rand() % (100 * columns * lines) == 0){
-                spawnEnemyBullet(e);
-            }
-        }
-            }
+
+
         }
 
         if (getYEnemy(e) > SCREEN_HEIGHT - getHEnemy(e) || collisionPlayerEnemy(p, e)){
@@ -94,6 +106,8 @@ void update(Game *game, float dt)
         *phase = END_GAME_WIN;
         return;
     }
+
+    game->boost_enemies = false;
 }
 
 

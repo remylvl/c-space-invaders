@@ -41,6 +41,7 @@ int main(void)
     }
 
     Uint32 last_ticks = SDL_GetTicks();
+    Uint32 speed_ticks = SDL_GetTicks();
 
     Player player = {
         .entity = {
@@ -51,8 +52,8 @@ int main(void)
         .vx = 0,
         .vy = 0,},
         .HP = 3,
-        .is_bullet_active = false,
-        .bullet = {0}
+        .bullets = malloc(3 * sizeof(Entity)),
+        .last_shot_ticks = 0
     };
 
     Enemy *enemies = malloc(sizeof(Enemy) * n * l);
@@ -81,7 +82,8 @@ int main(void)
         .gamephase = START_MENU,
         .p = player,
         .hearts = NULL,
-        .hearts_len = 0
+        .hearts_len = 0,
+        .boost_enemies = false
     };
 
     while (game.gamephase != QUITTING)
@@ -90,6 +92,12 @@ int main(void)
         float dt = (ticks - last_ticks) / 1000.0f;
         if (dt > 0.05f)
             dt = 0.05f;
+
+        if(ticks - speed_ticks > NORMAL_ENEMY_BOOST_INTERVAL) {
+            game.boost_enemies = true;
+            speed_ticks = ticks;
+        }
+
         last_ticks = ticks;
         SDL_PumpEvents();
         const Uint8 *keys = SDL_GetKeyboardState(NULL);

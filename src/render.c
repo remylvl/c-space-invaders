@@ -1,9 +1,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
-#include "game.h"
 #include "utilities.h"
 #include "entities.h"
 #include <stdio.h>
+#include "game.h"
 
 bool init(SDL_Window **window, SDL_Renderer **renderer)
 {
@@ -47,8 +47,6 @@ void renderGame(SDL_Renderer *renderer, TTF_Font *font, Game *game)
 {
 
     Player *p = &game->p;
-    bool bullet_active = p->is_bullet_active;
-    Entity *bullet = &p->bullet;
     Enemy *enemies = game->enemies;
     int lines = game->lines;
     int columns = game->columns; 
@@ -83,15 +81,19 @@ void renderGame(SDL_Renderer *renderer, TTF_Font *font, Game *game)
         }
     }
 
-    //Bullet
-    if (bullet_active)
+    //Bullets
+    for(int i = 0; i < MAX_BULLETS; i++)
     {
-        SDL_Rect bullet_rect = {
-            (int)getXEntity(bullet), (int)getYEntity(bullet),
-            getWEntity(bullet), getHEntity(bullet)};
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderFillRect(renderer, &bullet_rect);
-    }
+        Entity bullet = p->bullets[i];
+        if(bullet.is_visible){
+
+            SDL_Rect bullet_rect = {
+            (int)bullet.x, (int)bullet.y,
+            bullet.w, bullet.h};
+            
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &bullet_rect);
+    }}
 
     //Hearts
     for(int i = 0; i < game->hearts_len; i++){

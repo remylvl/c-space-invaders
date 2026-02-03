@@ -42,6 +42,7 @@ typedef struct
     Enemy *enemies;
     int lines;
     int columns;
+    bool boost_enemies;
 } Game;
 
 #endif

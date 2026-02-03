@@ -111,7 +111,10 @@ void setHEnemy(Enemy *e, int h);
 //Autres
 bool collisionBulletEnemy(Enemy *e, Entity *bullet);
 bool collisionPlayerEnemy(Player *p, Enemy *e);
-bool collisionBulletPlayer(Player *p, Entity *bullet);
+bool collisionEntityPlayer(Player *p, Entity *bullet);
 void spawnEnemyBullet(Enemy *e);
+void spawnHeart(Game *game, float x, float y);
+void playerCollectHeart(Game *game, Entity *heart);
+void deleteHeart(Entity *heart);
 void hurtPlayer(Player *p, int damage, GamePhase *phase);
 

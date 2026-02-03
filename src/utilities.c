@@ -1,6 +1,8 @@
 #include "entities.h"
 #include <stdbool.h>
 #include "game.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 //GETTERS
 //getX
@@ -172,10 +174,11 @@ bool collisionPlayerEnemy(Player *p, Enemy *e){
     && (getXPlayer(p) <= (getXEnemy(e) + getWEnemy(e))) && (getXPlayer(p) + getWPlayer(p) >= getXEnemy(e));
 }
 
-bool collisionBulletPlayer(Player *p, Entity *bullet){
+bool collisionEntityPlayer(Player *p, Entity *bullet){
     return (getYEntity(bullet) <= (getYPlayer(p) + getHPlayer(p))) && (getYEntity(bullet) + getHEntity(bullet) >= getYPlayer(p)) 
     && (getXEntity(bullet) <= (getXPlayer(p) + getWPlayer(p))) && (getXEntity(bullet) + getWEntity(bullet) >= getXPlayer(p));
 }
+
 
 
 void spawnEnemyBullet(Enemy *e){
@@ -188,8 +191,38 @@ void spawnEnemyBullet(Enemy *e){
     setVyEntity(bullet, NORMAL_ENNEMY_BULLET_SPEED);
 }
 
-void spawnHeart(Entity *hearts){
-    //realloc(hearts, );
+void spawnHeart(Game *game, float x, float y){
+    size_t new_len = game->hearts_len + 1;
+    Entity *tmp = realloc(game->hearts, new_len * sizeof(Entity));
+    if (tmp == NULL) {
+        return;
+    }
+    game->hearts = tmp;
+    game->hearts_len = (int)new_len;
+
+    Entity heart = {
+        .x = x,
+        .y = y,
+        .vy = HEART_SPEED,
+        .is_visible = true,
+        .h = 16,
+        .w = 16
+    };
+
+    game->hearts[game->hearts_len - 1] = heart;
+}
+
+void playerCollectHeart(Game *game, Entity *heart){
+    Player *p = &game->p;
+    if(p->HP < 5){
+        p->HP += 1;
+    }
+
+    deleteHeart(heart);
+}
+
+void deleteHeart(Entity *heart){
+    heart->is_visible = false;
 }
 
 void hurtPlayer(Player *p, int damage, GamePhase *phase){

@@ -93,6 +93,17 @@ void renderGame(SDL_Renderer *renderer, TTF_Font *font, Game *game)
         SDL_RenderFillRect(renderer, &bullet_rect);
     }
 
+    //Hearts
+    for(int i = 0; i < game->hearts_len; i++){
+        if(!game->hearts[i].is_visible) continue;
+        SDL_Rect case_rect = {
+            game->hearts[i].x, game->hearts[i].y, game->hearts[i].w, game->hearts[i].h};
+        SDL_Surface *s = SDL_LoadBMP("textures/heart.bmp");
+        SDL_Texture *t = SDL_CreateTextureFromSurface(renderer,s);
+        SDL_FreeSurface(s);
+        SDL_RenderCopy(renderer,t,NULL,&case_rect);
+    }
+
     //HP
     SDL_Surface *text = TTF_RenderUTF8_Solid(font, "Lives : ", (SDL_Color) {255, 255, 255, 255});
     SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, text);

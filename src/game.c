@@ -20,7 +20,6 @@ void update(Game *game, float dt)
 
     //Update Player
     setXPlayer(p, getXPlayer(p) + getVxPlayer(p) * dt);
-    //p->x += 
     if (getXPlayer(p) < 0)
         setXPlayer(p, 0);
     if (getXPlayer(p) + getWPlayer(p) > SCREEN_WIDTH)
@@ -35,6 +34,19 @@ void update(Game *game, float dt)
             *bullet_active = false;
     }
 
+    //Update Upgrades
+    for(int i = 0; i < game->hearts_len; i++){
+        if(!game->hearts[i].is_visible) continue;
+
+        game->hearts[i].y += game->hearts[i].vy * dt;
+        if(collisionEntityPlayer(p, &game->hearts[i])){
+            playerCollectHeart(game, &game->hearts[i]);
+        }
+
+        if (game->hearts[i].y + game->hearts[i].h > SCREEN_HEIGHT)
+        deleteHeart(&game->hearts[i]);
+    }
+
     //Update Enemies
     int counter = 0;
     for(int i = 0; i < (columns * lines); i++){
@@ -47,6 +59,10 @@ void update(Game *game, float dt)
         if(collisionBulletEnemy(e, bullet)){
             e->is_dead = true;
             *bullet_active = false;
+            if(rand() % 4 == 0){
+                spawnHeart(game, e->entity.x + e->entity.w / 2 - 8, e->entity.y + e->entity.h / 2 - 8);
+                
+            }
             }
         if(!e->is_bullet_active){
             if(rand() % (100 * columns * lines) == 0){
@@ -63,7 +79,7 @@ void update(Game *game, float dt)
         //Ennemy bullet
         if (e->is_bullet_active){
             setYEntity(&e->bullet, getYEntity(&e->bullet) + getVyEntity(&e->bullet) * dt);
-            if(collisionBulletPlayer(p, &e->bullet)){
+            if(collisionEntityPlayer(p, &e->bullet)){
                 e->is_bullet_active = false;
                 hurtPlayer(p, 1, phase);
             }

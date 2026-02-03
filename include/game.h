@@ -23,6 +23,8 @@
 #define BULLET_HEIGHT 20
 #define BULLET_SPEED 600.0f
 
+#define HEART_SPEED 100.0f
+
 
 void update(Game *game, float dt);
 

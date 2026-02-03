@@ -79,7 +79,9 @@ int main(void)
         .lines = l,
         .enemies = enemies,
         .gamephase = START_MENU,
-        .p = player
+        .p = player,
+        .hearts = NULL,
+        .hearts_len = 0
     };
 
     while (game.gamephase != QUITTING)
@@ -116,6 +118,7 @@ int main(void)
     if (font) TTF_CloseFont(font);
     if (hp_font) TTF_CloseFont(hp_font);
     cleanup(window, renderer);
-    free(enemies);
+    free(game.enemies);
+    free(game.hearts);
     return 0;
 }

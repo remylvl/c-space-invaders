@@ -1,5 +1,5 @@
 #include "entities.h"
-
+#include <SDL2/SDL.h>
 
 #ifndef GAMEPHASE
 #define GAMEPHASE
@@ -43,6 +43,8 @@ typedef struct
     int lines;
     int columns;
     bool boost_enemies;
+    int current_start_button;
+    Uint32 last_button_change_ticks;
 } Game;
 
 #endif
@@ -118,4 +120,5 @@ void spawnHeart(Game *game, float x, float y);
 void playerCollectHeart(Game *game, Entity *heart);
 void deleteHeart(Entity *heart);
 void hurtPlayer(Player *p, int damage, GamePhase *phase);
+void hurtEnemy(Enemy *e, int damage, Game *game, Entity *bullet);
 

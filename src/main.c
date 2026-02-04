@@ -52,6 +52,7 @@ int main(void)
         .vx = 0,
         .vy = 0,},
         .HP = 3,
+        .damage = 1,
         .bullets = malloc(3 * sizeof(Entity)),
         .last_shot_ticks = 0
     };
@@ -70,7 +71,8 @@ int main(void)
 
         .is_dead = false,
         .is_bullet_active = false,
-        .bullet = {0}        
+        .bullet = {0},
+        .type = NORMAL
         };
         enemies[i] = e;
     }
@@ -83,7 +85,9 @@ int main(void)
         .p = player,
         .hearts = NULL,
         .hearts_len = 0,
-        .boost_enemies = false
+        .boost_enemies = false,
+        .current_start_button = 0,
+        .last_button_change_ticks = 0
     };
 
     while (game.gamephase != QUITTING)
@@ -110,15 +114,15 @@ int main(void)
             break;
         case START_MENU :
             handle_input_starting(&game, keys);
-            renderStartMenu(renderer, font);
+            renderStartMenu(renderer, font, &game);
             break;
         case END_GAME_LOSE:
             handle_input_ending(&game, keys);
-            renderLoseMenu(renderer, font);
+            renderLoseMenu(renderer, font, &game);
             break;
         case END_GAME_WIN : 
             handle_input_ending(&game, keys);
-            renderWinMenu(renderer, font);
+            renderWinMenu(renderer, font, &game);
             break;
         default : break;
         }

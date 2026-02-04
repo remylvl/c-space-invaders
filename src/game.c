@@ -70,12 +70,7 @@ void update(Game *game, float dt)
             for(int i = 0; i < MAX_BULLETS; i++){
                 Entity *bullet = &p->bullets[i];
                 if(collisionBulletEnemy(e, bullet) && bullet->is_visible){
-                    e->is_dead = true;
-                    bullet->is_visible = false;
-                    if(rand() % HEART_RATE == 0){
-                        spawnHeart(game, e->entity.x + e->entity.w / 2 - 8, e->entity.y + e->entity.h / 2 - 8);
-                
-                    }
+                    hurtEnemy(e, p->damage, game, bullet);
                 }
 
                 

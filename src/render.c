@@ -134,7 +134,7 @@ void renderGame(SDL_Renderer *renderer, TTF_Font *font, Game *game)
 
 
 
-void renderStartMenu(SDL_Renderer *renderer, TTF_Font *font)
+void renderStartMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game)
 {
     //Background
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -158,25 +158,79 @@ void renderStartMenu(SDL_Renderer *renderer, TTF_Font *font)
 
     SDL_Rect start_rect = {
         (SCREEN_WIDTH - start->w) / 2,  // x position
-        2 * SCREEN_HEIGHT / 3,  // y position
+         SCREEN_HEIGHT / 2,  // y position
         start->w,  // width
         start->h  // height
     };
-
-    SDL_Rect unfill_rect = {
-        (SCREEN_WIDTH - start->w) / 2 - 0.25 * start->w,  // x position
-        2 * SCREEN_HEIGHT / 3 - 0.1 * start->h,  // y position
-        start->w * 1.5,  // width
-        start->h * 1.2  // height
-    };
     SDL_RenderCopy(renderer, start_texture, NULL, &start_rect);
+
+    //Difficulty Button
+    SDL_Surface *diff = TTF_RenderUTF8_Solid(font, "Difficulty", (SDL_Color) {255, 0, 0, 255});
+    SDL_Texture *diff_texture = SDL_CreateTextureFromSurface(renderer, diff);
+
+    SDL_Rect diff_rect = {
+        (SCREEN_WIDTH - diff->w) / 2,  // x position
+         SCREEN_HEIGHT / 2 + 2 * start->h,  // y position
+        diff->w,  // width
+        diff->h  // height
+    };
+    SDL_RenderCopy(renderer, diff_texture, NULL, &diff_rect);
+
+    //Exit button
+    SDL_Surface *exit = TTF_RenderUTF8_Solid(font, "Exit", (SDL_Color) {255, 0, 0, 255});
+    SDL_Texture *exit_texture = SDL_CreateTextureFromSurface(renderer, exit);
+
+    SDL_Rect exit_rect = {
+        (SCREEN_WIDTH - exit->w) / 2,  // x position
+         SCREEN_HEIGHT / 2 + + 2*start->h + 2 * diff->h,  // y position
+        exit->w,  // width
+        exit->h  // height
+    };
+    SDL_RenderCopy(renderer, exit_texture, NULL, &exit_rect);
+
+
+    int height;
+    int width;
+    int x;
+    int y;
+    switch(game->current_start_button){
+        case 0: 
+        width = start->w * 1.5;
+        height = start->h * 1.2;
+        x = (SCREEN_WIDTH - start->w) / 2 - 0.25 * start->w;
+        y = SCREEN_HEIGHT / 2 - 0.1 * start->h;
+        break;
+        case 1: 
+        height = diff->h * 1.2;
+        width = diff->w * 1.5;
+        x = (SCREEN_WIDTH - diff->w) / 2 - 0.25 * diff->w;
+        y = SCREEN_HEIGHT / 2 + 2 * start->h - 0.1 * diff->h;
+        break;
+        case 2: 
+        height = exit->h * 1.2;
+        width = exit->w * 1.5;
+        x = (SCREEN_WIDTH - exit->w) / 2 - 0.25 * exit->w;
+        y = SCREEN_HEIGHT / 2 + 2*start->h + 2 * diff->h - 0.1 * start->h;
+        break;
+        default: break;
+
+
+    }
+    //Selected Button
+    SDL_Rect unfill_rect = {
+        x,  // x position
+        y,  // y position
+        width,  // width
+        height  // height
+    };
+    
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderDrawRect(renderer, &unfill_rect);
 
     SDL_RenderPresent(renderer);
 }
 
-void renderLoseMenu(SDL_Renderer *renderer, TTF_Font *font)
+void renderLoseMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game)
 {
     //Background
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -209,7 +263,7 @@ void renderLoseMenu(SDL_Renderer *renderer, TTF_Font *font)
     SDL_RenderPresent(renderer);
 }
 
-void renderWinMenu(SDL_Renderer *renderer, TTF_Font *font)
+void renderWinMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game)
 {
     //Background
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

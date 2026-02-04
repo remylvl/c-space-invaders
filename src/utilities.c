@@ -231,3 +231,15 @@ void hurtPlayer(Player *p, int damage, GamePhase *phase){
         *phase = END_GAME_LOSE;
     }
 }
+
+void hurtEnemy(Enemy *e, int damage, Game *game, Entity *bullet){
+    bullet->is_visible = false;
+    e->HP -= damage;
+    if(e->HP <= 0){
+        e->is_dead = true;
+        if(rand() % HEART_RATE == 0){
+        spawnHeart(game, e->entity.x + e->entity.w / 2 - 8, e->entity.y + e->entity.h / 2 - 8);
+        }
+    }
+    
+}

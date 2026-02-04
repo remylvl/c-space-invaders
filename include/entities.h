@@ -26,6 +26,7 @@ typedef struct
     int HP;
     Entity *bullets;
     Uint32 last_shot_ticks;
+    int damage;
 } Player;
 
 

@@ -402,7 +402,7 @@ void renderLoseMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game)
     SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 
     //leave text
-    SDL_Surface *leave = TTF_RenderUTF8_Solid(font, "Press Enter to leave", (SDL_Color) {255, 0, 0, 255});
+    SDL_Surface *leave = TTF_RenderUTF8_Solid(font, "Press Enter", (SDL_Color) {255, 0, 0, 255});
     SDL_Texture *leave_texture = SDL_CreateTextureFromSurface(renderer, leave);
 
     SDL_Rect leave_rect = {
@@ -412,6 +412,18 @@ void renderLoseMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game)
         leave->h  // height
     };
     SDL_RenderCopy(renderer, leave_texture, NULL, &leave_rect);
+
+    //leave text 2
+    SDL_Surface *leave2 = TTF_RenderUTF8_Solid(font, "to return to the main menu", (SDL_Color) {255, 0, 0, 255});
+    SDL_Texture *leave2_texture = SDL_CreateTextureFromSurface(renderer, leave2);
+
+    SDL_Rect leave2_rect = {
+        (SCREEN_WIDTH - leave2->w) / 2,  // x position
+        2 * SCREEN_HEIGHT / 3 + 2 * leave->h,  // y position
+        leave2->w,  // width
+        leave2->h  // height
+    };
+    SDL_RenderCopy(renderer, leave2_texture, NULL, &leave2_rect);
     
     SDL_RenderPresent(renderer);
 }
@@ -435,7 +447,7 @@ void renderWinMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game)
     SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 
     //leave text
-    SDL_Surface *leave = TTF_RenderUTF8_Solid(font, "Press Enter to leave", (SDL_Color) {0, 255, 0, 255});
+    SDL_Surface *leave = TTF_RenderUTF8_Solid(font, "Press Enter", (SDL_Color) {0, 255, 0, 255});
     SDL_Texture *leave_texture = SDL_CreateTextureFromSurface(renderer, leave);
 
     SDL_Rect leave_rect = {
@@ -445,9 +457,24 @@ void renderWinMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game)
         leave->h  // height
     };
     SDL_RenderCopy(renderer, leave_texture, NULL, &leave_rect);
+
+    //leave text 2
+    SDL_Surface *leave2 = TTF_RenderUTF8_Solid(font, "to return to the main menu", (SDL_Color) {0, 255, 0, 255});
+    SDL_Texture *leave2_texture = SDL_CreateTextureFromSurface(renderer, leave2);
+
+    SDL_Rect leave2_rect = {
+        (SCREEN_WIDTH - leave2->w) / 2,  // x position
+        2 * SCREEN_HEIGHT / 3 + 2 * leave->h,  // y position
+        leave2->w,  // width
+        leave2->h  // height
+    };
+    SDL_RenderCopy(renderer, leave2_texture, NULL, &leave2_rect);
+
     
     SDL_RenderPresent(renderer);
 }
+
+
 
 void cleanup(SDL_Window *window, SDL_Renderer *renderer)
 {

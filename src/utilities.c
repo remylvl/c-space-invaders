@@ -243,3 +243,66 @@ void hurtEnemy(Enemy *e, int damage, Game *game, Entity *bullet){
     }
     
 }
+
+void initLevel1(Game *game){
+
+    const int offsetX = NORMAL_ENNEMY_WIDTH / 2;
+    const int offsetY = SCREEN_HEIGHT / 10;
+
+    Entity e = {
+        .x = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2,
+        .y = SCREEN_HEIGHT - 60,
+        .w = PLAYER_WIDTH,
+        .h = PLAYER_HEIGHT,
+        .vx = 0,
+        .vy = 0};
+    game->p.entity = e;
+    game->p.HP = 3;
+    game->p.damage = 1;
+    game->p.bullets = malloc(MAX_BULLETS * sizeof(Entity));
+    for(int i = 0; i < MAX_BULLETS; i++){
+        game->p.bullets[i].is_visible = false;
+    }
+    game->p.last_shot_ticks = 0;
+
+    Enemy *enemies = malloc(sizeof(Enemy) * LEVEL1_COLUMNS * LEVEL1_LINES);
+    if(enemies == NULL) return;
+    for(int i = 0; i < (LEVEL1_COLUMNS * LEVEL1_LINES); i++){
+        Enemy e = {
+            .entity = {
+            .x = offsetX + i%LEVEL1_COLUMNS * ((SCREEN_WIDTH - 2 * NORMAL_ENNEMY_WIDTH)/(LEVEL1_COLUMNS-1)) ,
+            .y = offsetY + (i/LEVEL1_COLUMNS) * 2 * NORMAL_ENNEMY_HEIGHT,
+            .w = NORMAL_ENNEMY_WIDTH,
+            .h = NORMAL_ENNEMY_HEIGHT,
+            .vx = 0,
+            .vy = NORMAL_ENNEMY_SPEED},
+
+        .is_dead = false,
+        .is_bullet_active = false,
+        .bullet = {0},
+        .HP = 1,
+        .type = NORMAL
+        };
+        enemies[i] = e;
+    }
+    game->columns = LEVEL1_COLUMNS;
+    game->enemies = enemies;
+    game->gamephase = PLAYING;
+    game->lines = LEVEL1_LINES;
+    game->level = LEVEL1;
+}
+
+void clearGame(Game *game){
+    free(game->enemies);
+    free(game->hearts);
+    game->boost_enemies = false;
+    game->current_level_button = 0;
+    game->current_start_button = 0;
+    game->enemies = NULL;
+    game->hearts = NULL;
+    game->gamephase = START_MENU;
+    game->hearts_len = 0;
+    Uint32 ticks = SDL_GetTicks();
+    game->last_button_change_ticks = ticks;
+    free(game->p.bullets);
+}

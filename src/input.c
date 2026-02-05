@@ -97,10 +97,12 @@ void handle_input_level_choosing(Game *game, const Uint8 *keys)
 
     if(keys[SDL_SCANCODE_RETURN] && ticks - game->last_button_change_ticks > 200.0f){
         switch(game->current_level_button){
-        case 0 : *phase = PLAYING;
+        case 0 : 
+        initLevel1(game);
         break;
         case 5 : *phase = START_MENU;
         game->last_button_change_ticks = ticks;
+        game->current_level_button = 0;
         break;
         default: break;
     }}
@@ -136,7 +138,7 @@ void handle_input_ending(Game *game, const Uint8 *keys)
     }
 
     if(keys[SDL_SCANCODE_RETURN]){
-        *phase = QUITTING;
+        clearGame(game);
     }
 }
 

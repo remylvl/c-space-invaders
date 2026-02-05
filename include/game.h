@@ -31,6 +31,9 @@
 #define HEART_SPEED 100.0f
 #define HEART_RATE 8
 
+#define LEVEL1_LINES 3
+#define LEVEL1_COLUMNS 6
+
 
 void update(Game *game, float dt);
 

@@ -45,7 +45,6 @@ typedef struct
     bool boost_enemies;
     int current_start_button;
     int current_level_button;
-    int current_end_button;
     Uint32 last_button_change_ticks;
 } Game;
 
@@ -123,4 +122,6 @@ void playerCollectHeart(Game *game, Entity *heart);
 void deleteHeart(Entity *heart);
 void hurtPlayer(Player *p, int damage, GamePhase *phase);
 void hurtEnemy(Enemy *e, int damage, Game *game, Entity *bullet);
+void initLevel1(Game *game);
+void clearGame(Game *game);
 

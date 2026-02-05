@@ -12,10 +12,6 @@ int main(void)
 {
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
-    const int n = 5;
-    const int l = 3; 
-    const int offsetX = NORMAL_ENNEMY_WIDTH / 2;
-    const int offsetY = SCREEN_HEIGHT / 10;
 
     if (!init(&window, &renderer))
     {
@@ -43,46 +39,13 @@ int main(void)
     Uint32 last_ticks = SDL_GetTicks();
     Uint32 speed_ticks = SDL_GetTicks();
 
-    Player player = {
-        .entity = {
-        .x = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2,
-        .y = SCREEN_HEIGHT - 60,
-        .w = PLAYER_WIDTH,
-        .h = PLAYER_HEIGHT,
-        .vx = 0,
-        .vy = 0,},
-        .HP = 3,
-        .damage = 1,
-        .bullets = malloc(3 * sizeof(Entity)),
-        .last_shot_ticks = 0
-    };
-
-    Enemy *enemies = malloc(sizeof(Enemy) * n * l);
-    if(enemies == NULL) return 1;
-    for(int i = 0; i < (n * l); i++){
-        Enemy e = {
-            .entity = {
-            .x = offsetX + i%n * ((SCREEN_WIDTH - 2 * NORMAL_ENNEMY_WIDTH)/(n-1)) ,
-            .y = offsetY + (i/n) * 2 * NORMAL_ENNEMY_HEIGHT,
-            .w = NORMAL_ENNEMY_WIDTH,
-            .h = NORMAL_ENNEMY_HEIGHT,
-            .vx = 0,
-            .vy = NORMAL_ENNEMY_SPEED},
-
-        .is_dead = false,
-        .is_bullet_active = false,
-        .bullet = {0},
-        .type = NORMAL
-        };
-        enemies[i] = e;
-    }
 
     Game game = {
-        .columns = n,
-        .lines = l,
-        .enemies = enemies,
+        .columns = 0,
+        .lines = 0,
+        .enemies = NULL,
         .gamephase = START_MENU,
-        .p = player,
+        .p = {},
         .hearts = NULL,
         .hearts_len = 0,
         .boost_enemies = false,
@@ -108,6 +71,7 @@ int main(void)
 
         switch(game.gamephase){
         case PLAYING : 
+            
             handle_input_playing(&game, keys);
             update(&game, dt);
             renderGame(renderer, hp_font, &game);
@@ -134,7 +98,5 @@ int main(void)
     if (font) TTF_CloseFont(font);
     if (hp_font) TTF_CloseFont(hp_font);
     cleanup(window, renderer);
-    free(game.enemies);
-    free(game.hearts);
     return 0;
 }

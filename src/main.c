@@ -116,6 +116,10 @@ int main(void)
             handle_input_starting(&game, keys);
             renderStartMenu(renderer, font, &game);
             break;
+        case CHOOSING_LEVEL:
+            handle_input_level_choosing(&game, keys);
+            renderLevelMenu(renderer, font, &game);
+            break;
         case END_GAME_LOSE:
             handle_input_ending(&game, keys);
             renderLoseMenu(renderer, font, &game);

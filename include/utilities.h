@@ -44,6 +44,8 @@ typedef struct
     int columns;
     bool boost_enemies;
     int current_start_button;
+    int current_level_button;
+    int current_end_button;
     Uint32 last_button_change_ticks;
 } Game;
 

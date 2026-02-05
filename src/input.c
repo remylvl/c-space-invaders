@@ -56,9 +56,10 @@ void handle_input_starting(Game *game, const Uint8 *keys)
             *phase = QUITTING;
     }
 
-    if(keys[SDL_SCANCODE_RETURN]){
+    if(keys[SDL_SCANCODE_RETURN] && ticks - game->last_button_change_ticks > 200.0f){
         switch(game->current_start_button){
-        case 0 : *phase = PLAYING;
+        case 0 : *phase = CHOOSING_LEVEL;
+        game->last_button_change_ticks = ticks;
         break;
         case 2 : *phase = QUITTING;
         break;
@@ -82,6 +83,47 @@ void handle_input_starting(Game *game, const Uint8 *keys)
         break;
     }}
 }
+
+void handle_input_level_choosing(Game *game, const Uint8 *keys)
+{
+    GamePhase *phase = &game->gamephase;
+    SDL_Event event;
+    Uint32 ticks = SDL_GetTicks();
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+            *phase = QUITTING;
+    }
+
+    if(keys[SDL_SCANCODE_RETURN] && ticks - game->last_button_change_ticks > 200.0f){
+        switch(game->current_level_button){
+        case 0 : *phase = PLAYING;
+        break;
+        case 5 : *phase = START_MENU;
+        game->last_button_change_ticks = ticks;
+        break;
+        default: break;
+    }}
+
+    if((keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_LEFT]) && ticks - game->last_button_change_ticks > 200.0f){
+        game->last_button_change_ticks = ticks;
+        switch(game->current_level_button){
+        case 0 : game->current_level_button = 5;
+        break;
+        default: game->current_level_button -= 1;
+        break;
+    }}
+    if((keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_RIGHT]) && ticks - game->last_button_change_ticks > 200.0f){
+        game->last_button_change_ticks = ticks;
+        switch(game->current_level_button){
+        case 5 : game->current_level_button = 0;
+        break;
+        default: game->current_level_button += 1;
+        break;
+    }}
+}
+
+
 
 void handle_input_ending(Game *game, const Uint8 *keys)
 {

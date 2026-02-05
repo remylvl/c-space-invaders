@@ -11,4 +11,5 @@ void renderGame(SDL_Renderer *renderer, TTF_Font *font, Game *game);
 void renderStartMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game);
 void renderWinMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game);
 void renderLoseMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game);
+void renderLevelMenu(SDL_Renderer *renderer, TTF_Font *font, Game *game);
 void cleanup(SDL_Window *window, SDL_Renderer *renderer);

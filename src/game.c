@@ -62,7 +62,11 @@ void update(Game *game, float dt)
             }
 
             if(!e->is_bullet_active){
-                    if(rand() % (NORMAL_ENNEMY_SHOOT_RATE * columns * lines) == 0){
+                int rate = NORMAL_ENNEMY_SHOOT_RATE;
+                if(e->type == FAST_SHOOTING){
+                    rate = FAST_ENNEMY_SHOOT_RATE;
+                }
+                    if(rand() % (rate * columns * lines) == 0){
                         spawnEnemyBullet(e);
                 }
             }

@@ -7,7 +7,7 @@
 typedef enum
 {
     START_MENU,
-    SETTINGS,
+    CHOOSING_DIFFICULTY,
     CHOOSING_LEVEL,
     PLAYING,
     END_GAME_WIN,
@@ -24,8 +24,22 @@ typedef enum
 {
     LEVEL1,
     LEVEL2,
-    LEVEL3
+    LEVEL3,
+    LEVEL4,
+    LEVEL5
 } Level;
+
+#endif
+
+#ifndef DIFFICULTY
+#define DIFFICULTY
+
+typedef enum
+{
+    EASY,
+    MEDIUM,
+    HARD
+} Difficulty;
 
 #endif
 
@@ -46,6 +60,7 @@ typedef struct
     int current_start_button;
     int current_level_button;
     Uint32 last_button_change_ticks;
+    Difficulty difficulty;
 } Game;
 
 #endif
@@ -123,5 +138,8 @@ void deleteHeart(Entity *heart);
 void hurtPlayer(Player *p, int damage, GamePhase *phase);
 void hurtEnemy(Enemy *e, int damage, Game *game, Entity *bullet);
 void initLevel1(Game *game);
+void initLevel2(Game *game);
+void initLevel3(Game *game);
+void initLevel4(Game *game);
 void clearGame(Game *game);
 

@@ -9,3 +9,4 @@ void handle_input_playing(Game *game, const Uint8 *keys);
 void handle_input_starting(Game *game, const Uint8 *keys);
 void handle_input_ending(Game *game, const Uint8 *keys);
 void handle_input_level_choosing(Game *game, const Uint8 *keys);
+void handle_input_difficulty_choosing(Game *game, const Uint8 *keys);

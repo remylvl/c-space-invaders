@@ -189,6 +189,10 @@ void spawnEnemyBullet(Enemy *e){
     setWEntity(bullet, NORMAL_ENNEMY_BULLET_WIDTH);
     setHEntity(bullet, NORMAL_ENNEMY_BULLET_HEIGHT);
     setVyEntity(bullet, NORMAL_ENNEMY_BULLET_SPEED);
+
+    if(e->type == FAST_SHOOTING){
+        setVyEntity(bullet, FAST_ENNEMY_BULLET_SPEED);
+    }
 }
 
 void spawnHeart(Game *game, float x, float y){
@@ -244,11 +248,7 @@ void hurtEnemy(Enemy *e, int damage, Game *game, Entity *bullet){
     
 }
 
-void initLevel1(Game *game){
-
-    const int offsetX = NORMAL_ENNEMY_WIDTH / 2;
-    const int offsetY = SCREEN_HEIGHT / 10;
-
+void initLevel(Game *game){
     Entity e = {
         .x = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2,
         .y = SCREEN_HEIGHT - 60,
@@ -257,13 +257,25 @@ void initLevel1(Game *game){
         .vx = 0,
         .vy = 0};
     game->p.entity = e;
-    game->p.HP = 3;
+    game->p.HP = 3 - game->difficulty;
     game->p.damage = 1;
     game->p.bullets = malloc(MAX_BULLETS * sizeof(Entity));
     for(int i = 0; i < MAX_BULLETS; i++){
         game->p.bullets[i].is_visible = false;
     }
     game->p.last_shot_ticks = 0;
+
+    game->gamephase = PLAYING;
+}
+
+
+void initLevel1(Game *game){
+
+    const int offsetX = NORMAL_ENNEMY_WIDTH / 2;
+    const int offsetY = SCREEN_HEIGHT / 10;
+
+    initLevel(game);
+    const float speed_multiplier = game->difficulty == EASY ? 0.9 : game->difficulty == MEDIUM ? 1 : 1.1;
 
     Enemy *enemies = malloc(sizeof(Enemy) * LEVEL1_COLUMNS * LEVEL1_LINES);
     if(enemies == NULL) return;
@@ -275,7 +287,7 @@ void initLevel1(Game *game){
             .w = NORMAL_ENNEMY_WIDTH,
             .h = NORMAL_ENNEMY_HEIGHT,
             .vx = 0,
-            .vy = NORMAL_ENNEMY_SPEED},
+            .vy = NORMAL_ENNEMY_SPEED*speed_multiplier},
 
         .is_dead = false,
         .is_bullet_active = false,
@@ -287,10 +299,161 @@ void initLevel1(Game *game){
     }
     game->columns = LEVEL1_COLUMNS;
     game->enemies = enemies;
-    game->gamephase = PLAYING;
     game->lines = LEVEL1_LINES;
     game->level = LEVEL1;
 }
+
+void initLevel2(Game *game){
+
+    const int offsetX = NORMAL_ENNEMY_WIDTH / 2;
+    const int offsetY = SCREEN_HEIGHT / 10;
+
+    initLevel(game);
+    const float speed_multiplier = game->difficulty == EASY ? 0.9 : game->difficulty == MEDIUM ? 1 : 1.1;
+
+    Enemy *enemies = malloc(sizeof(Enemy) * LEVEL2_COLUMNS * LEVEL2_LINES);
+    if(enemies == NULL) return;
+    for(int i = 0; i < (LEVEL2_COLUMNS * LEVEL2_LINES); i++){
+
+        EnemyType type = NORMAL;
+        int HP = 1;
+        float speed = NORMAL_ENNEMY_SPEED;
+
+        
+        if(i > LEVEL2_COLUMNS * (LEVEL2_LINES - 1)){
+            type = RESISTANT;
+            HP = 2;
+        }
+
+        if(i % LEVEL2_COLUMNS == 0 || i % LEVEL2_COLUMNS == LEVEL2_COLUMNS - 1){
+            type = FAST_MOVING;
+            speed = FAST_ENNEMY_SPEED;
+            HP = 1;
+        }
+        Enemy e = {
+            .entity = {
+            .x = offsetX + i%LEVEL2_COLUMNS * ((SCREEN_WIDTH - 2 * NORMAL_ENNEMY_WIDTH)/(LEVEL2_COLUMNS-1)) ,
+            .y = offsetY + (i/LEVEL2_COLUMNS) * 2 * NORMAL_ENNEMY_HEIGHT,
+            .w = NORMAL_ENNEMY_WIDTH,
+            .h = NORMAL_ENNEMY_HEIGHT,
+            .vx = 0,
+            .vy = speed*speed_multiplier},
+
+        .is_dead = false,
+        .is_bullet_active = false,
+        .bullet = {0},
+        .HP = HP,
+        .type = type
+        };
+        enemies[i] = e;
+    }
+    game->columns = LEVEL2_COLUMNS;
+    game->enemies = enemies;
+    game->lines = LEVEL2_LINES;
+    game->level = LEVEL2;
+}
+
+void initLevel3(Game *game){
+
+    const int offsetX = NORMAL_ENNEMY_WIDTH / 2;
+    const int offsetY = SCREEN_HEIGHT / 10;
+
+    initLevel(game);
+    const float speed_multiplier = game->difficulty == EASY ? 0.9 : game->difficulty == MEDIUM ? 1 : 1.1;
+
+    Enemy *enemies = malloc(sizeof(Enemy) * LEVEL3_COLUMNS * LEVEL3_LINES);
+    if(enemies == NULL) return;
+    for(int i = 0; i < (LEVEL3_COLUMNS * LEVEL3_LINES); i++){
+
+        EnemyType type = FAST_SHOOTING;
+        int HP = 1;
+        float speed = NORMAL_ENNEMY_SPEED;
+
+        
+        if(i >= LEVEL3_COLUMNS * (LEVEL3_LINES - 2)){
+            type = RESISTANT;
+            HP = 2;
+        }
+
+        Enemy e = {
+            .entity = {
+            .x = offsetX + i%LEVEL3_COLUMNS * ((SCREEN_WIDTH - 2 * NORMAL_ENNEMY_WIDTH)/(LEVEL3_COLUMNS-1)) ,
+            .y = offsetY + (i/LEVEL3_COLUMNS) * 2 * NORMAL_ENNEMY_HEIGHT,
+            .w = NORMAL_ENNEMY_WIDTH,
+            .h = NORMAL_ENNEMY_HEIGHT,
+            .vx = 0,
+            .vy = speed*speed_multiplier},
+
+        .is_dead = false,
+        .is_bullet_active = false,
+        .bullet = {0},
+        .HP = HP,
+        .type = type
+        };
+        enemies[i] = e;
+    }
+    game->columns = LEVEL3_COLUMNS;
+    game->enemies = enemies;
+    game->lines = LEVEL3_LINES;
+    game->level = LEVEL3;
+}
+
+void initLevel4(Game *game){
+
+    const int offsetX = NORMAL_ENNEMY_WIDTH / 2;
+    const int offsetY = SCREEN_HEIGHT / 10;
+
+    initLevel(game);
+    const float speed_multiplier = game->difficulty == EASY ? 0.9 : game->difficulty == MEDIUM ? 1 : 1.1;
+
+    Enemy *enemies = malloc(sizeof(Enemy) * LEVEL4_COLUMNS * LEVEL4_LINES);
+    if(enemies == NULL) return;
+    for(int i = 0; i < (LEVEL4_COLUMNS * LEVEL4_LINES); i++){
+
+        EnemyType type = NORMAL;
+        int HP = 1;
+        float speed = NORMAL_ENNEMY_SPEED;
+
+        if(i >= LEVEL4_COLUMNS * (LEVEL4_LINES - 2)){
+            type = RESISTANT;
+            HP = 2;
+        }
+
+        if(i >= LEVEL4_COLUMNS * (LEVEL4_LINES - 1)){
+            type = FAST_MOVING;
+            HP = 1;
+            speed = FAST_ENNEMY_SPEED;
+        }
+        if(i < LEVEL4_COLUMNS){
+            type = FAST_SHOOTING;
+            HP = 1;
+            speed = NORMAL_ENNEMY_SPEED;
+        }
+
+        Enemy e = {
+            .entity = {
+            .x = offsetX + i%LEVEL4_COLUMNS * ((SCREEN_WIDTH - 2 * NORMAL_ENNEMY_WIDTH)/(LEVEL4_COLUMNS-1)) ,
+            .y = offsetY + (i/LEVEL4_COLUMNS) * 2 * NORMAL_ENNEMY_HEIGHT,
+            .w = NORMAL_ENNEMY_WIDTH,
+            .h = NORMAL_ENNEMY_HEIGHT,
+            .vx = 0,
+            .vy = speed*speed_multiplier},
+
+        .is_dead = false,
+        .is_bullet_active = false,
+        .bullet = {0},
+        .HP = HP,
+        .type = type
+        };
+        enemies[i] = e;
+    }
+    game->columns = LEVEL4_COLUMNS;
+    game->enemies = enemies;
+    game->lines = LEVEL4_LINES;
+    game->level = LEVEL4;
+}
+
+
 
 void clearGame(Game *game){
     free(game->enemies);

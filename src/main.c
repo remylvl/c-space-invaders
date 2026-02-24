@@ -29,7 +29,7 @@ int main(void)
     }
 
     TTF_Font *hp_font = TTF_OpenFont("/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf", 48);
-    if (!font)
+    if (!hp_font)
     {
         SDL_Log("Erreur chargement police: %s", TTF_GetError());
         cleanup(window, renderer);
@@ -50,7 +50,8 @@ int main(void)
         .hearts_len = 0,
         .boost_enemies = false,
         .current_start_button = 0,
-        .last_button_change_ticks = 0
+        .last_button_change_ticks = 0,
+        .difficulty = EASY
     };
 
     while (game.gamephase != QUITTING)
@@ -84,13 +85,17 @@ int main(void)
             handle_input_level_choosing(&game, keys);
             renderLevelMenu(renderer, font, &game);
             break;
+        case CHOOSING_DIFFICULTY:
+            handle_input_difficulty_choosing(&game, keys);
+            renderDifficultyMenu(renderer, font, &game);
+            break;
         case END_GAME_LOSE:
             handle_input_ending(&game, keys);
-            renderLoseMenu(renderer, font, &game);
+            renderLoseMenu(renderer, font);
             break;
         case END_GAME_WIN : 
             handle_input_ending(&game, keys);
-            renderWinMenu(renderer, font, &game);
+            renderWinMenu(renderer, font);
             break;
         default : break;
         }

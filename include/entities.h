@@ -7,7 +7,7 @@ typedef enum EnemyType{
     NORMAL,
     FAST_MOVING,
     FAST_SHOOTING,
-    RESISTENT,
+    RESISTANT,
     BOSS
 } EnemyType;
 

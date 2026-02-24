@@ -1,9 +1,9 @@
-- Différents types d'ennemis avec différentes caractéristiques
+- Différents types d'ennemis avec différentes caractéristiques X
 - Nouveaux bonus
 - Textures pour player et ennemies
-- Menu navigable (Start, Difficulty, Skin, Exit)
-- Selection de niveau
+- Menu navigable (Start, Difficulty, Skin, Exit) X
+- Selection de niveau X
 - Menu pause
-- Possibilité de revenir au menu principal après fin de game avec clear et reset de tout ce qu'il faut
+- Possibilité de revenir au menu principal après fin de game avec clear et reset de tout ce qu'il faut X
 - Sauvegarde de parties
 - Implémentation d'un score à côté de la vie

@@ -61,6 +61,9 @@ void handle_input_starting(Game *game, const Uint8 *keys)
         case 0 : *phase = CHOOSING_LEVEL;
         game->last_button_change_ticks = ticks;
         break;
+        case 1 : *phase = CHOOSING_DIFFICULTY;
+        game->last_button_change_ticks = ticks;
+        break;
         case 2 : *phase = QUITTING;
         break;
         default: break;
@@ -84,6 +87,54 @@ void handle_input_starting(Game *game, const Uint8 *keys)
     }}
 }
 
+void handle_input_difficulty_choosing(Game *game, const Uint8 *keys)
+{
+    GamePhase *phase = &game->gamephase;
+    SDL_Event event;
+    Uint32 ticks = SDL_GetTicks();
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+            *phase = QUITTING;
+    }
+
+    if(keys[SDL_SCANCODE_RETURN] && ticks - game->last_button_change_ticks > 200.0f){
+        switch(game->current_level_button){
+        case 0 : 
+        game->difficulty = EASY;
+        break;
+        case 1 : 
+        game->difficulty = MEDIUM;
+        break;
+        case 2 : 
+        game->difficulty = HARD;
+        break;
+        default: break;
+    }
+
+    *phase = START_MENU;
+    game->last_button_change_ticks = ticks;
+    game->current_level_button = 0;
+}
+
+    if((keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_LEFT]) && ticks - game->last_button_change_ticks > 200.0f){
+        game->last_button_change_ticks = ticks;
+        switch(game->current_level_button){
+        case 0 : game->current_level_button = 3;
+        break;
+        default: game->current_level_button -= 1;
+        break;
+    }}
+    if((keys[SDL_SCANCODE_DOWN] || keys[SDL_SCANCODE_RIGHT]) && ticks - game->last_button_change_ticks > 200.0f){
+        game->last_button_change_ticks = ticks;
+        switch(game->current_level_button){
+        case 3 : game->current_level_button = 0;
+        break;
+        default: game->current_level_button += 1;
+        break;
+    }}
+}
+
 void handle_input_level_choosing(Game *game, const Uint8 *keys)
 {
     GamePhase *phase = &game->gamephase;
@@ -99,6 +150,15 @@ void handle_input_level_choosing(Game *game, const Uint8 *keys)
         switch(game->current_level_button){
         case 0 : 
         initLevel1(game);
+        break;
+        case 1 : 
+        initLevel2(game);
+        break;
+        case 2 : 
+        initLevel3(game);
+        break;
+        case 3 : 
+        initLevel4(game);
         break;
         case 5 : *phase = START_MENU;
         game->last_button_change_ticks = ticks;
